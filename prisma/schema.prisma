@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ↓↓↓ Bunları buraya ekliyorsun ↓↓↓
+
+model Tenant {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Authors  Author[]
+  Books    Book[]
+  ToBuy    ToBuyBook[]
+}
+
+model Author {
+  id                String   @id @default(cuid())
+  tenantId          String
+  name              String
+  nickname          String?
+  origin            String?
+  birthDate         String?
+  deathDate         String?
+  birthPlace        String?
+  deathPlace        String?
+  officialDuties    String?
+  fiqhMadhhab       String?
+  aqidahMadhhab     String?
+  famousWorks       String?
+  teachers          String?
+  students          String?
+  statusInTabakat   String?
+  expertiseAreas    String?
+  importantNotes    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  Books             Book[]
+  ToBuyBooks        ToBuyBook[]
+
+  Tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model Book {
+  id            String   @id @default(cuid())
+  tenantId      String
+  title         String
+  authorId      String?
+  genre         String?
+  publisher     String?
+  volumeCount   Int?
+  library       String?
+  shelf         String?
+  number        String?
+  note          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  Author  Author? @relation(fields: [authorId], references: [id])
+  Tenant  Tenant  @relation(fields: [tenantId], references: [id])
+}
+
+enum PurchaseStatus {
+  pending
+  ordered
+  bought
+  dismissed
+}
+
+model ToBuyBook {
+  id            String         @id @default(cuid())
+  tenantId      String
+  title         String
+  authorId      String?
+  genre         String?
+  publisher     String?
+  volumeCount   Int?
+  note          String?
+  status        PurchaseStatus @default(pending)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  Author Author? @relation(fields: [authorId], references: [id])
+  Tenant Tenant  @relation(fields: [tenantId], references: [id])
+}
