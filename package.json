@@ -2,17 +2,23 @@
   "name": "kutuphane-yonetim-sistemi",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.11.0 <21.0.0",
+    "pnpm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && node scripts/clean-prisma-wasm.js && next build",
     "start": "next start",
     "lint": "eslint",
+    "type-check": "tsc --noEmit",
     "db:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && node scripts/clean-prisma-wasm.js && prisma migrate deploy && next build",
+    "clean-prisma-wasm": "node scripts/clean-prisma-wasm.js"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "schema": "prisma/schema.prisma"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

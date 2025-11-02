@@ -21,17 +21,18 @@ const assignTenantSchema = z.object({
 // PUT /api/users/[id] → Kullanıcı bilgilerini güncelle
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
 
+    const { id } = await params;
     const body = await req.json();
     const validated = updateUserSchema.parse(body);
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingUser) {
@@ -83,14 +84,16 @@ export async function PUT(
         ? validated.username.trim() 
         : null;
     }
-    if (validated.name !== undefined) updateData.name = validated.name || null;
+    if (validated.name !== undefined) {
+      updateData.name = validated.name || undefined;
+    }
     if (validated.password) {
       updateData.password = await bcrypt.hash(validated.password, 10);
     }
 
     // Update user
     const user = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         userTenants: {
@@ -120,13 +123,15 @@ export async function PUT(
 // DELETE /api/users/[id] → Kullanıcıyı sil
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
 
+    const { id } = await params;
+
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!user) {
@@ -135,7 +140,7 @@ export async function DELETE(
 
     // Delete user (cascade will handle related records)
     await prisma.user.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Kullanıcı silindi" });

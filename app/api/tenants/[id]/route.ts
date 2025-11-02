@@ -14,17 +14,18 @@ const updateTenantSchema = z.object({
 // PUT /api/tenants/[id] → Tenant bilgilerini güncelle
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
 
+    const { id } = await params;
     const body = await req.json();
     const validated = updateTenantSchema.parse(body);
 
     // Check if tenant exists
     const existingTenant = await prisma.tenant.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingTenant) {
@@ -72,7 +73,7 @@ export async function PUT(
 
     // Update tenant
     const tenant = await prisma.tenant.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         _count: {
@@ -104,13 +105,15 @@ export async function PUT(
 // DELETE /api/tenants/[id] → Tenant'ı sil
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
 
+    const { id } = await params;
+
     const tenant = await prisma.tenant.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!tenant) {
@@ -119,9 +122,9 @@ export async function DELETE(
 
     // Check if tenant has data (optional - can be removed if cascade delete is desired)
     const [booksCount, authorsCount, usersCount] = await Promise.all([
-      prisma.book.count({ where: { tenantId: params.id } }),
-      prisma.author.count({ where: { tenantId: params.id } }),
-      prisma.userTenant.count({ where: { tenantId: params.id } }),
+      prisma.book.count({ where: { tenantId: id } }),
+      prisma.author.count({ where: { tenantId: id } }),
+      prisma.userTenant.count({ where: { tenantId: id } }),
     ]);
 
     if (booksCount > 0 || authorsCount > 0 || usersCount > 0) {
@@ -135,7 +138,7 @@ export async function DELETE(
 
     // Delete tenant (cascade will handle related records)
     await prisma.tenant.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Tenant silindi" });

@@ -12,10 +12,10 @@ export async function GET() {
   try {
     const { tenant } = await requireAuthAndTenant();
 
-    const data = await prisma.book.findMany({
-      where: { tenantId: tenant.id },
-      orderBy: { createdAt: "desc" },
-      take: 100,
+  const data = await prisma.book.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: { createdAt: "desc" },
+    take: 100,
       include: {
         Author: {
           select: {
@@ -25,9 +25,9 @@ export async function GET() {
           },
         },
       },
-    });
+  });
 
-    return NextResponse.json(data);
+  return NextResponse.json(data);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Bir hata oluştu";
     return NextResponse.json({ error: message }, { status: 401 });
@@ -39,12 +39,12 @@ export async function POST(req: NextRequest) {
   try {
     const { tenant } = await requireAuthAndTenant();
 
-    const body = await req.json();
+  const body = await req.json();
     const validated = bookSchema.parse(body);
 
-    const created = await prisma.book.create({
-      data: {
-        tenantId: tenant.id,
+  const created = await prisma.book.create({
+    data: {
+      tenantId: tenant.id,
         ...validated,
       },
       include: {
@@ -55,10 +55,10 @@ export async function POST(req: NextRequest) {
             nickname: true,
           },
         },
-      },
-    });
+    },
+  });
 
-    return NextResponse.json(created, { status: 201 });
+  return NextResponse.json(created, { status: 201 });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json(

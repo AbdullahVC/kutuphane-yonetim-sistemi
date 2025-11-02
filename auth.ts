@@ -1,11 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma as any),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -21,6 +17,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
+        // Dynamic imports to avoid loading in Edge Runtime during build
+        const [{ prisma }, bcrypt] = await Promise.all([
+          import("@/lib/prisma"),
+          import("bcryptjs"),
+        ]);
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
         });
@@ -29,7 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const isPasswordValid = await bcrypt.compare(
+        const isPasswordValid = await bcrypt.default.compare(
           credentials.password as string,
           user.password
         );

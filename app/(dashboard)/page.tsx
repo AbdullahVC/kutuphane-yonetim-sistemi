@@ -121,94 +121,94 @@ export default async function Home({
           </div>
         </div>
       ) : await (async () => {
-          const [booksCount, authorsCount, toBuyCount, pendingCount, orderedCount, boughtCount] =
+  const [booksCount, authorsCount, toBuyCount, pendingCount, orderedCount, boughtCount] =
             await Promise.all([
-              prisma.book.count({ where: { tenantId: tenant.id } }),
-              prisma.author.count({ where: { tenantId: tenant.id } }),
-              prisma.toBuyBook.count({ where: { tenantId: tenant.id } }),
-              prisma.toBuyBook.count({ where: { tenantId: tenant.id, status: "pending" } }),
-              prisma.toBuyBook.count({ where: { tenantId: tenant.id, status: "ordered" } }),
-              prisma.toBuyBook.count({ where: { tenantId: tenant.id, status: "bought" } }),
+          prisma.book.count({ where: { tenantId: tenant.id } }),
+          prisma.author.count({ where: { tenantId: tenant.id } }),
+          prisma.toBuyBook.count({ where: { tenantId: tenant.id } }),
+          prisma.toBuyBook.count({ where: { tenantId: tenant.id, status: "pending" } }),
+          prisma.toBuyBook.count({ where: { tenantId: tenant.id, status: "ordered" } }),
+          prisma.toBuyBook.count({ where: { tenantId: tenant.id, status: "bought" } }),
             ]);
 
-          return (
-            <div className="space-y-6">
+  return (
+    <div className="space-y-6">
               <div className="mb-4">
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Ana Sayfa</h1>
                 <p className="text-sm sm:text-base text-muted-foreground">Kütüphane yönetim sistemine hoş geldiniz.</p>
-              </div>
+      </div>
 
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Toplam Kitap</CardTitle>
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{booksCount}</div>
-                    <p className="text-xs text-muted-foreground">Kayıtlı kitap sayısı</p>
-                  </CardContent>
-                </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Toplam Kitap</CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{booksCount}</div>
+            <p className="text-xs text-muted-foreground">Kayıtlı kitap sayısı</p>
+          </CardContent>
+        </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Yazarlar</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{authorsCount}</div>
-                    <p className="text-xs text-muted-foreground">Kayıtlı yazar sayısı</p>
-                  </CardContent>
-                </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Yazarlar</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{authorsCount}</div>
+            <p className="text-xs text-muted-foreground">Kayıtlı yazar sayısı</p>
+          </CardContent>
+        </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Satın Alınacak</CardTitle>
-                    <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{toBuyCount}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {pendingCount} bekliyor, {orderedCount} sipariş, {boughtCount} alındı
-                    </p>
-                  </CardContent>
-                </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Satın Alınacak</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{toBuyCount}</div>
+            <p className="text-xs text-muted-foreground">
+              {pendingCount} bekliyor, {orderedCount} sipariş, {boughtCount} alındı
+            </p>
+          </CardContent>
+        </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Bekleyen</CardTitle>
-                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{pendingCount}</div>
-                    <p className="text-xs text-muted-foreground">Satın alınmayı bekleyen kitap</p>
-                  </CardContent>
-                </Card>
-              </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Bekleyen</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingCount}</div>
+            <p className="text-xs text-muted-foreground">Satın alınmayı bekleyen kitap</p>
+          </CardContent>
+        </Card>
+      </div>
 
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
+        <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg">Hızlı Erişim</CardTitle>
                     <CardDescription className="mt-1">Kütüphane yönetim sayfalarına hızlı erişim</CardDescription>
-                  </CardHeader>
+          </CardHeader>
                   <CardContent className="space-y-2 pt-0">
-                    <Button asChild variant="outline" className="w-full justify-start">
-                      <Link href="/books">
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        Kitapları Görüntüle
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="w-full justify-start">
-                      <Link href="/to-buy">
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        Satın Alınacak Kitaplar
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link href="/books">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Kitapları Görüntüle
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link href="/to-buy">
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Satın Alınacak Kitaplar
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
           );
         })()}
     </>
