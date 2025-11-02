@@ -1,16 +1,52 @@
-import { PrismaClient } from "../app/generated/prisma"; // client'ı senin output yoluna göre aldık
+import { PrismaClient } from "../app/generated/prisma";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1) Tenant ekle
+  // 1) User ekle (admin)
+  const hashedPassword = await bcrypt.hash("admin123", 10);
+  const user = await prisma.user.upsert({
+    where: { email: "admin@example.com" },
+    update: {
+      username: "admin",
+    },
+    create: {
+      email: "admin@example.com",
+      username: "admin",
+      name: "Admin Kullanıcı",
+      password: hashedPassword,
+    },
+  });
+
+  // 2) Tenant ekle
   const tenant = await prisma.tenant.upsert({
     where: { slug: "default" },
     update: {},
-    create: { slug: "default", name: "Medrese Kütüphanesi" },
+    create: {
+      slug: "default",
+      name: "Medrese Kütüphanesi",
+      ownerId: user.id,
+    },
   });
 
-  // 2) Author ekle
+  // 3) User-Tenant ilişkisi
+  await prisma.userTenant.upsert({
+    where: {
+      userId_tenantId: {
+        userId: user.id,
+        tenantId: tenant.id,
+      },
+    },
+    update: { role: "admin" },
+    create: {
+      userId: user.id,
+      tenantId: tenant.id,
+      role: "admin",
+    },
+  });
+
+  // 4) Author ekle
   const author = await prisma.author.create({
     data: {
       tenantId: tenant.id,
@@ -26,7 +62,7 @@ async function main() {
     },
   });
 
-  // 3) Book ekle
+  // 5) Book ekle
   await prisma.book.create({
     data: {
       tenantId: tenant.id,
@@ -42,7 +78,7 @@ async function main() {
     },
   });
 
-  // 4) Satın alınacak kitap ekle
+  // 6) Satın alınacak kitap ekle
   await prisma.toBuyBook.create({
     data: {
       tenantId: tenant.id,

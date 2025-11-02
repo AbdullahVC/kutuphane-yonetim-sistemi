@@ -1,64 +1,49 @@
-// app/api/books/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { bookSchema } from "@/lib/validations/book";
+import { authorSchema } from "@/lib/validations/author";
 import { ZodError } from "zod";
 import { requireAuthAndTenant } from "@/lib/api-helpers";
 
 export const runtime = "nodejs";
 
-// GET /api/books → son eklenen 100 kitabı getir (Author relation ile)
-export async function GET() {
+// GET /api/authors → tüm yazarları getir
+export async function GET(req: NextRequest) {
   try {
     const { tenant } = await requireAuthAndTenant();
 
-    const data = await prisma.book.findMany({
+    const authors = await prisma.author.findMany({
       where: { tenantId: tenant.id },
-      orderBy: { createdAt: "desc" },
-      take: 100,
+      orderBy: { name: "asc" },
       include: {
-        Author: {
-          select: {
-            id: true,
-            name: true,
-            nickname: true,
-          },
+        _count: {
+          select: { Books: true, ToBuyBooks: true },
         },
       },
     });
 
-    return NextResponse.json(data);
+    return NextResponse.json(authors);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Bir hata oluştu";
     return NextResponse.json({ error: message }, { status: 401 });
   }
 }
 
-// POST /api/books → yeni kitap ekle
+// POST /api/authors → yeni yazar ekle
 export async function POST(req: NextRequest) {
   try {
     const { tenant } = await requireAuthAndTenant();
 
     const body = await req.json();
-    const validated = bookSchema.parse(body);
+    const validated = authorSchema.parse(body);
 
-    const created = await prisma.book.create({
+    const author = await prisma.author.create({
       data: {
         tenantId: tenant.id,
         ...validated,
       },
-      include: {
-        Author: {
-          select: {
-            id: true,
-            name: true,
-            nickname: true,
-          },
-        },
-      },
     });
 
-    return NextResponse.json(created, { status: 201 });
+    return NextResponse.json(author, { status: 201 });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json(

@@ -1,36 +1,146 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 Kütüphane Yönetim Sistemi
 
-## Getting Started
+Modern, multi-tenant kütüphane yönetim sistemi. Kitaplar, yazarlar ve satın alınacak kitapları yönetmek için kapsamlı bir çözüm.
 
-First, run the development server:
+## ✨ Özellikler
 
+- 🔐 **Kullanıcı Kimlik Doğrulama**: NextAuth.js ile güvenli giriş
+- 🏢 **Multi-Tenant Yapı**: Her kütüphane bağımsız çalışır
+- 👥 **Kullanıcı Yönetimi**: Admin paneli ile kullanıcı ve tenant yönetimi
+- 📖 **Kitap Yönetimi**: Kitap ekleme, düzenleme, silme
+- ✍️ **Yazar Yönetimi**: Detaylı yazar bilgileri
+- 🛒 **Satın Alma Listesi**: Alınacak kitapları takip etme
+- 📊 **Dashboard**: İstatistikler ve özet bilgiler
+- 🎨 **Modern UI**: Tailwind CSS ve shadcn/ui ile modern tasarım
+
+## 🚀 Hızlı Başlangıç
+
+### Gereksinimler
+
+- Node.js 18+
+- pnpm (veya npm/yarn)
+- PostgreSQL veritabanı (Neon, Supabase, vb.)
+
+### Yerel Kurulum
+
+1. **Repository'yi klonlayın**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/KULLANICI_ADI/kutuphane-yonetim-sistemi.git
+cd kutuphane-yonetim-sistemi
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Bağımlılıkları yükleyin**
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Environment variables ayarlayın**
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env` dosyasını düzenleyin:
+```env
+DATABASE_URL=postgresql://user:password@host:port/database
+AUTH_SECRET=your-secret-key-here
+NODE_ENV=development
+```
 
-## Learn More
+4. **Database migration'ları çalıştırın**
+```bash
+npx prisma migrate deploy
+npx prisma generate
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. **Seed verileri ekleyin (opsiyonel)**
+```bash
+pnpm db:seed
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+6. **Development server'ı başlatın**
+```bash
+pnpm dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Uygulama `http://localhost:3000` adresinde çalışacaktır.
 
-## Deploy on Vercel
+### Varsayılan Giriş Bilgileri
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Seed sonrası:
+- **Email**: `admin@example.com`
+- **Password**: `admin123`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**⚠️ Production'da mutlaka şifreyi değiştirin!**
+
+## 📦 Deployment
+
+Detaylı deployment rehberi için [DEPLOYMENT.md](./DEPLOYMENT.md) dosyasına bakın.
+
+### Vercel'e Deploy
+
+1. GitHub'a push edin
+2. Vercel'e import edin
+3. Environment variables ekleyin:
+   - `DATABASE_URL`
+   - `AUTH_SECRET`
+   - `NODE_ENV=production`
+4. Deploy!
+
+## 🏗️ Proje Yapısı
+
+```
+├── app/
+│   ├── (dashboard)/      # Dashboard sayfaları
+│   │   ├── admin/        # Admin paneli
+│   │   ├── books/        # Kitap yönetimi
+│   │   ├── authors/      # Yazar yönetimi
+│   │   └── to-buy/       # Satın alma listesi
+│   ├── api/              # API routes
+│   └── login/            # Login sayfası
+├── components/           # React component'leri
+├── lib/                  # Utility fonksiyonları
+├── prisma/               # Prisma schema ve migrations
+└── public/               # Static dosyalar
+```
+
+## 🔧 Teknolojiler
+
+- **Framework**: Next.js 16 (App Router)
+- **Database**: PostgreSQL + Prisma ORM
+- **Authentication**: NextAuth.js v5
+- **UI**: Tailwind CSS, shadcn/ui
+- **Validation**: Zod
+- **Language**: TypeScript
+
+## 👥 Kullanıcı Rolleri
+
+### Admin
+- Tüm kullanıcıları yönetebilir
+- Tenant (kütüphane) oluşturabilir ve yönetebilir
+- Kullanıcılara tenant atayabilir
+- Rolleri değiştirebilir
+
+### Member
+- Kendi tenant'ındaki kitapları yönetebilir
+- Yazarlar ekleyebilir/düzenleyebilir
+- Satın alma listesini yönetebilir
+
+## 📝 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır.
+
+## 🤝 Katkıda Bulunma
+
+1. Fork edin
+2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)
+3. Commit edin (`git commit -m 'Add some AmazingFeature'`)
+4. Push edin (`git push origin feature/AmazingFeature`)
+5. Pull Request açın
+
+## 📧 İletişim
+
+Sorularınız için issue açabilirsiniz.
+
+---
+
+**Made with ❤️ for library management**
